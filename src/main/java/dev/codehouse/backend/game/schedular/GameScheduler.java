@@ -17,4 +17,7 @@ public class GameScheduler {
     public void calculateResult() {
         oddEvenService.calculateResult();
     }
+
+    @Scheduled(cron="0 0 * * * *")
+    public void resetForNewRound(){oddEvenService.resetForNewRound();}
 }
