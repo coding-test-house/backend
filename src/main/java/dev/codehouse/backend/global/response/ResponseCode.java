@@ -15,9 +15,16 @@ public enum ResponseCode {
     //401 Unauthorized
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "존재하지 않는 아이디입니다."),
 
-    //200 OK
-    USER_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다.");
+    //404
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "공지사항이 존재하지 않습니다."),
 
+    //200 OK
+    USER_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
+    NOTICE_FOUND(HttpStatus.OK, "공지사항 조회 성공"),
+    NOTICE_UPDATED(HttpStatus.OK, "공지사항 수정 완료"),
+
+    //201
+    NOTICE_CREATED(HttpStatus.CREATED, "초기 공지사항이 생성되었습니다.");
 
     private final HttpStatus status;
     private final String message;
