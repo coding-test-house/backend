@@ -14,6 +14,6 @@ public class TestController {
 
     @GetMapping("/test")
     public ResponseEntity<ApiResponse<String>> test() {
-        return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, "테스트 성공");
+        return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, "테스트 성공!!");
     }
 }
