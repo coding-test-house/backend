@@ -1,0 +1,12 @@
+spring:
+  config:
+    import: "application-secret.yml"
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+  # 로컬에서 개발 환경 실행: java -jar app.jar --spring.profiles.active=dev
+  profiles:
+    active: dev
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
