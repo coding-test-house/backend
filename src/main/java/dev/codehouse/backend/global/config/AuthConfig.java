@@ -1,4 +1,4 @@
-package dev.codehouse.backend.user.config;
+package dev.codehouse.backend.global.config;
 
 
 import org.springframework.context.annotation.Bean;

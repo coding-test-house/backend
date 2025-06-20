@@ -1,7 +1,7 @@
-package dev.codehouse.backend.user.security;
+package dev.codehouse.backend.global.security;
 
 
-import dev.codehouse.backend.user.util.JwtUtil;
+import dev.codehouse.backend.global.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

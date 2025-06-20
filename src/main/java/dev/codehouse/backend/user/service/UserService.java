@@ -3,7 +3,7 @@ package dev.codehouse.backend.user.service;
 import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.dto.UserRequestDto;
 import dev.codehouse.backend.user.repository.UserRepository;
-import dev.codehouse.backend.user.util.JwtUtil;
+import dev.codehouse.backend.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;

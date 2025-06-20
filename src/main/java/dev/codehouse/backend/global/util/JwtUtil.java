@@ -1,4 +1,4 @@
-package dev.codehouse.backend.user.util;
+package dev.codehouse.backend.global.util;
 
 
 import io.jsonwebtoken.JwtBuilder;
