@@ -6,8 +6,10 @@ import dev.codehouse.backend.global.response.ResponseCode;
 import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminPointService {
@@ -20,6 +22,7 @@ public class AdminPointService {
         user.adjustPoint(delta);
         userRepository.save(user);
 
+        log.info("관리자 포인트 조정: userId={}, delta={}", userId, delta);
         return UserPointResponse.from(user);
     }
 }
