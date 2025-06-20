@@ -33,4 +33,6 @@ public class AdminController {
         noticeService.updateNotice(dto);
         return ApiResponseFactory.success(ResponseCode.NOTICE_UPDATED);
     }
+
+
 }
