@@ -34,4 +34,8 @@ public class User {
 
     @Builder.Default
     private int point = 0;
+
+    public void adjustPoint(int delta) {
+        this.point += delta;
+    }
 }
