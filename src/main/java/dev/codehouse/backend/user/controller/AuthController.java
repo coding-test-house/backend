@@ -30,14 +30,30 @@ public class AuthController {
 
     @PostMapping("/confirm")
     public ResponseEntity<ApiResponse<Void>> confirm(@RequestBody UserRequestDto request) {
-        userService.userExists(request.getUsername());
+        try {
+            userService.userExists(request.getUsername(), request.getClasses());
+        } catch (IllegalArgumentException e) {
+            if(e.getMessage().contains("회차"))
+                return ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND);
+            return ApiResponseFactory.success(ResponseCode.USER_NOT_FOUND);
+        }
+        catch (Exception e) {
+            return ApiResponseFactory.success(ResponseCode.DATABASE_ERROR);
+        }
         return ApiResponseFactory.success(ResponseCode.USER_CONFIRM_SUCCESS);
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, String>>> login(@RequestBody UserRequestDto request) {
-        Map<String, String> tokens = userService.login(request);
+        Map<String, String> tokens = null;
+        try {
+             tokens = userService.login(request);
+        } catch (Exception e) {
+            if(e.getMessage().contains("존재")){
+                return ApiResponseFactory.success(ResponseCode.USER_NOT_FOUND,tokens);
+            }
+            return ApiResponseFactory.success(ResponseCode.INVALID_PASSWORD,tokens);
+        }
         return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, tokens);
     }
-
 }
