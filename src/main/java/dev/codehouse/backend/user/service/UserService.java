@@ -36,17 +36,22 @@ public class UserService {
      * @param username 확인할 사용자 이름
      * @throws RuntimeException API 호출 실패시
      */
-    public void userExists(String username) {
+    public void userExists(String username, String className) throws Exception {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("사용자명이 비어있습니다.");
         }
         try {
-            fetchUserInfo(username);
+            if(getRightUser(username, className)){
+                return;
+            } else {
+                throw  new IllegalArgumentException("회차 정보가 일치하지 않습니다");
+            }
         } catch (IllegalArgumentException e) {
             throw e; // API에서 사용자를 찾을 수 없는 경우
         } catch (Exception e) {
             throw new RuntimeException("외부 API 호출 중 오류가 발생했습니다: " + e.getMessage());
         }
+
     }
 
     /**
@@ -58,6 +63,43 @@ public class UserService {
         return userRepository.findAll();
     }
 
+
+    private boolean getRightUser(String handle, String classes) throws Exception {
+        String urlStr = "https://www.acmicpc.net/user/" + handle;
+        URL url = new URL(urlStr);
+        System.out.println(urlStr);
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; UserChecker/1.0)");
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 404) {
+                System.out.println("not found: " + handle);
+                throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+            }
+            if (responseCode != 200) {
+                throw new RuntimeException("error: " + responseCode);
+            }
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder responseBuilder = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    responseBuilder.append(inputLine);
+                }
+                if(responseBuilder.toString().contains(classes)){
+                    return true;
+                }
+                System.out.println("wrong class: " + handle + " - " + classes);
+                throw new IllegalArgumentException("회차 정보가 일치하지 않습니다");
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
     /**
      * solved.ac API에서 사용자 정보를 가져옴
      *
@@ -78,7 +120,9 @@ public class UserService {
             if (responseCode == 404) {
                 throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
             }
-
+            if (responseCode != 200) {
+                System.out.println("error: " + responseCode);
+            }
             try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                 StringBuilder responseBuilder = new StringBuilder();
                 String inputLine;
@@ -101,24 +145,27 @@ public class UserService {
      * @throws IllegalArgumentException 이미 존재하는 사용자이거나 클래스 정보가 유효하지 않은 경우
      * @throws RuntimeException         API 호출 실패시
      */
-    public void register(UserRequestDto request) {
+    public void register(UserRequestDto request) throws Exception{
         if (request == null || request.getUsername() == null || request.getPassword() == null) {
             throw new IllegalArgumentException("요청 형식이 올바르지 않습니다.");
         }
-
         try {
-            // solved.ac API 검증
-            JSONObject userInfo = fetchUserInfo(request.getUsername());
-            int rating = fetchUserRating(userInfo);
-            validateUserClass(userInfo.getString("bio"), request.getClasses());
-
+            if (userRepository.existsByUsername(request.getUsername())) {
+                System.out.println("already exist");
+                throw new DuplicateKeyException("이미 존재하는 사용자입니다");
+            }
+            if(!getRightUser(request.getUsername(), request.getClasses())){
+                throw new IllegalArgumentException("회차 정보 또는 존재하지 않는 사용자입니다");
+            }
             User user = User.builder()
                     .username(request.getUsername())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role("USER")
-                    .point(rating)
+                    .point(500)
                     .classes(request.getClasses())
-                    .startPoint(rating)
+                    .startPoint(500)
+                    .solvedProblems(null)
+                    .gameResults(null)
                     .build();
 
             userRepository.save(user);
@@ -132,15 +179,6 @@ public class UserService {
         }
     }
 
-    private int fetchUserRating(JSONObject userInfo) {
-        return userInfo.getInt("rating");
-    }
-
-    private void validateUserClass(String actualClass, String expectedClass) {
-        if (!actualClass.equals(expectedClass)) {
-            throw new IllegalArgumentException("올바르지 않은 회차입니다.");
-        }
-    }
 
     /**
      * 사용자 인증 및 JWT 토큰 생성
@@ -149,10 +187,10 @@ public class UserService {
      * @return 액세스 토큰과 리프레시 토큰이 담긴 Map
      * @throws IllegalArgumentException 사용자를 찾을 수 없거나 비밀번호가 일치하지 않는 경우
      */
-    public Map<String, String> login(UserRequestDto request) {
+    public Map<String, String> login(UserRequestDto request) throws Exception {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
+        System.out.println(passwordEncoder.matches(request.getPassword(), user.getPassword()));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
