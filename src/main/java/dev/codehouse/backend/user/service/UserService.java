@@ -8,6 +8,7 @@ import dev.codehouse.backend.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -256,5 +257,14 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("사용자 정보 업데이트 실패: " + e.getMessage());
         }
+    }
+
+    /**
+     * User 들을 point 에 따라 내림차순 정렬하여 반환하는 함수
+     * @return User List 형태로 반환
+     */
+    public List<User> getUserSortedByPoint(){
+        Sort sort = Sort.by(Sort.Direction.DESC, "point");
+        return userRepository.findAll(sort);
     }
 }
