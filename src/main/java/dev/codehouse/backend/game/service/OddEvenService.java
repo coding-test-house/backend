@@ -122,12 +122,10 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
         int resultNumber = random.nextInt(100) + 1;
         boolean isEven = (resultNumber % 2 == 0);
-
         String resultType = isEven ? "even" : "odd";
 
         redisRepository.putResult(getResultKey(roundKey), resultType);
 
-        //점수 분배
         for (String betJson : allBets.values()) {
             Bet bet;
             try {
@@ -140,18 +138,24 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
                     .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + bet.getUsername()));
 
             boolean userChoseEven = bet.getBetType().equalsIgnoreCase("even");
-            if (userChoseEven == isEven) {
-                //배당 내용(수정 예정)
+            boolean win = (userChoseEven == isEven);
+
+            if (win) {
                 user.setPoint(user.getPoint() + bet.getBetAmount() * 2);
+                user.addGameResult(List.of(roundKey, "WIN", String.valueOf(bet.getBetAmount())));
+            } else {
+                user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
             }
 
             userRepository.save(user);
         }
 
+        // Redis 정리
         redisRepository.deleteBets(betsKey);
         redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
         redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
     }
+
 
     /**
      * 00분에 호출되는 메서드 (새로운 라운드 시작 전 초기화)
