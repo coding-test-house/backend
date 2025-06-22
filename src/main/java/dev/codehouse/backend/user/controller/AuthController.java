@@ -24,7 +24,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody UserRequestDto request) {
-        userService.register(request);
+        try {
+            userService.register(request);
+        } catch (IllegalArgumentException e){
+            if(e.getMessage().contains("회차")){
+                ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND);
+            }
+            if(e.getMessage().contains("error")){
+                return ApiResponseFactory.success(ResponseCode.USER_NOT_FOUND);
+            }
+            return ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND);
+        } catch (Exception e) {
+            return ApiResponseFactory.success(ResponseCode.DUPLICATE_USERNAME);
+        }
         return ApiResponseFactory.success(ResponseCode.USER_REGISTER_SUCCESS);
     }
 
@@ -51,7 +63,10 @@ public class AuthController {
         } catch (Exception e) {
             if(e.getMessage().contains("존재")){
                 return ApiResponseFactory.success(ResponseCode.USER_NOT_FOUND,tokens);
+            } else if(e.getMessage().contains("회차")){
+                return ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND,tokens);
             }
+            System.out.println(e.getMessage());
             return ApiResponseFactory.success(ResponseCode.INVALID_PASSWORD,tokens);
         }
         return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, tokens);

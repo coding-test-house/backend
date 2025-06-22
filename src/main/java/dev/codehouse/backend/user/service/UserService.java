@@ -91,6 +91,7 @@ public class UserService {
                 if(responseBuilder.toString().contains(classes)){
                     return true;
                 }
+                System.out.println("wrong class: " + handle + " - " + classes);
                 throw new IllegalArgumentException("회차 정보가 일치하지 않습니다");
             }
         } finally {
@@ -144,14 +145,15 @@ public class UserService {
      * @throws IllegalArgumentException 이미 존재하는 사용자이거나 클래스 정보가 유효하지 않은 경우
      * @throws RuntimeException         API 호출 실패시
      */
-    public void register(UserRequestDto request) {
+    public void register(UserRequestDto request) throws Exception{
         if (request == null || request.getUsername() == null || request.getPassword() == null) {
             throw new IllegalArgumentException("요청 형식이 올바르지 않습니다.");
         }
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 사용자입니다");
-        }
         try {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                System.out.println("already exist");
+                throw new DuplicateKeyException("이미 존재하는 사용자입니다");
+            }
             if(!getRightUser(request.getUsername(), request.getClasses())){
                 throw new IllegalArgumentException("회차 정보 또는 존재하지 않는 사용자입니다");
             }
@@ -162,6 +164,8 @@ public class UserService {
                     .point(500)
                     .classes(request.getClasses())
                     .startPoint(500)
+                    .solvedProblems(null)
+                    .gameResults(null)
                     .build();
 
             userRepository.save(user);
@@ -186,7 +190,7 @@ public class UserService {
     public Map<String, String> login(UserRequestDto request) throws Exception {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
+        System.out.println(passwordEncoder.matches(request.getPassword(), user.getPassword()));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
