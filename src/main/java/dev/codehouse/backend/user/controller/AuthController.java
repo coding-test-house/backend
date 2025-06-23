@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -43,6 +43,7 @@ public class AuthController {
     @PostMapping("/confirm")
     public ResponseEntity<ApiResponse<Void>> confirm(@RequestBody UserRequestDto request) {
         try {
+            System.out.println(request.getUsername()+ " " + request.getClasses());
             userService.userExists(request.getUsername(), request.getClasses());
         } catch (IllegalArgumentException e) {
             if(e.getMessage().contains("회차"))
