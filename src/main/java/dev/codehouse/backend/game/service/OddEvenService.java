@@ -154,10 +154,10 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
             userRepository.save(user);
         }
-
-        redisRepository.deleteBets(betsKey);
-        redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
-        redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
+//
+//        redisRepository.deleteBets(betsKey);
+//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
+//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
     }
 
 
