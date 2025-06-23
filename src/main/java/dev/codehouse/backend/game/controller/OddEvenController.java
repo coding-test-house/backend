@@ -8,16 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/oddeven")
+@RequestMapping("/api/oddeven")
 @RequiredArgsConstructor
 public class OddEvenController {
 
     private final OddEvenService oddEvenService;
 
-    @PostMapping("/bet")
-    public void bet(@RequestBody OddEvenRequestDto dto) {
-        oddEvenService.bet(dto);
+    @PostMapping("/bet/{username}")
+    public void bet(@PathVariable String username, @RequestBody OddEvenRequestDto dto) {
+        oddEvenService.bet(username, dto);
     }
+
+
 
     @GetMapping("/roundSummary/{username}")
     public BetSummaryResponseDto getCurrentRoundSummary(@PathVariable String username) {
