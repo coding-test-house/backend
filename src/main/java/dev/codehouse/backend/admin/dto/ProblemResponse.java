@@ -1,11 +1,8 @@
 package dev.codehouse.backend.admin.dto;
 
-import dev.codehouse.backend.admin.entity.Problem;
-import dev.codehouse.backend.user.domain.User;
+import dev.codehouse.backend.problem.entity.Problem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
