@@ -10,6 +10,8 @@ public class ProblemResponse {
     private String title;
     private String problemNumber;
     private String url;
+    private String difficulty;
+    private int point;
     private String day;
 
     public static ProblemResponse from(Problem problem) {
@@ -17,6 +19,8 @@ public class ProblemResponse {
                 problem.getTitle(),
                 problem.getProblemNumber(),
                 problem.getUrl(),
+                problem.getDifficulty(),
+                problem.getPoint(),
                 problem.getDay()
         );
     }
