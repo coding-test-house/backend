@@ -16,13 +16,13 @@ public class AdminPointService {
 
     private final UserRepository userRepository;
 
-    public UserPointResponse adjustUserPoint(String userId, int delta) {
-        User user = userRepository.findById(userId)
+    public UserPointResponse adjustUserPoint(String username, int delta) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AdminException(ResponseCode.USER_NOT_FOUND));
         user.adjustPoint(delta);
         userRepository.save(user);
 
-        log.info("관리자 포인트 조정: userId={}, delta={}", userId, delta);
+        log.info("관리자 포인트 조정: userId={}, delta={}", username, delta);
         return UserPointResponse.from(user);
     }
 }

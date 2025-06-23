@@ -7,6 +7,10 @@ import dev.codehouse.backend.admin.repository.ProblemRepository;
 import dev.codehouse.backend.global.exception.AdminException;
 import dev.codehouse.backend.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,4 +45,19 @@ public class AdminProblemService {
                 .map(ProblemResponse::from)
                 .toList();
     }
+
+    public List<ProblemResponse> getAllProblems() {
+        List<Problem> problems = problemRepository.findAll();
+        return problems.stream()
+                .map(ProblemResponse::from)
+                .toList();
+    }
+
+    //전체 문제 조회 (페이징)
+    public Page<ProblemResponse> getAllProblemsPaged(int page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return problemRepository.findAll(pageable).map(ProblemResponse::from);
+    }
+
+
 }
