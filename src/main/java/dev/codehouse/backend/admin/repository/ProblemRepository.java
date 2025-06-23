@@ -1,6 +1,6 @@
 package dev.codehouse.backend.admin.repository;
 
-import dev.codehouse.backend.admin.entity.Problem;
+import dev.codehouse.backend.problem.entity.Problem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
