@@ -2,7 +2,7 @@ package dev.codehouse.backend.admin.service;
 
 import dev.codehouse.backend.admin.dto.ProblemRequest;
 import dev.codehouse.backend.admin.dto.ProblemResponse;
-import dev.codehouse.backend.admin.entity.Problem;
+import dev.codehouse.backend.problem.entity.Problem;
 import dev.codehouse.backend.admin.repository.ProblemRepository;
 import dev.codehouse.backend.global.exception.AdminException;
 import dev.codehouse.backend.global.response.ResponseCode;
@@ -52,12 +52,4 @@ public class AdminProblemService {
                 .map(ProblemResponse::from)
                 .toList();
     }
-
-    //전체 문제 조회 (페이징)
-    public Page<ProblemResponse> getAllProblemsPaged(int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return problemRepository.findAll(pageable).map(ProblemResponse::from);
-    }
-
-
 }
