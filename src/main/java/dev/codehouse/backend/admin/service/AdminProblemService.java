@@ -7,6 +7,10 @@ import dev.codehouse.backend.admin.repository.ProblemRepository;
 import dev.codehouse.backend.global.exception.AdminException;
 import dev.codehouse.backend.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +41,13 @@ public class AdminProblemService {
     //날짜로 문제 조회
     public List<ProblemResponse> getProblems(String day) {
         List<Problem> problems = problemRepository.findByDay(day);
+        return problems.stream()
+                .map(ProblemResponse::from)
+                .toList();
+    }
+
+    public List<ProblemResponse> getAllProblems() {
+        List<Problem> problems = problemRepository.findAll();
         return problems.stream()
                 .map(ProblemResponse::from)
                 .toList();

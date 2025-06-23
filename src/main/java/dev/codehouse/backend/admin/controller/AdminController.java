@@ -8,6 +8,7 @@ import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,20 +29,14 @@ public class AdminController {
     }
 
     @PostMapping("/notice")
-    public ResponseEntity<ApiResponse<Void>> createNotice() {
-        noticeService.createInitialNotice();
-        return ApiResponseFactory.success(ResponseCode.NOTICE_CREATED);
-    }
-
-    @PatchMapping("/notice")
     public ResponseEntity<ApiResponse<Void>> updateNotice(@RequestBody NoticeRequest dto) {
-        noticeService.updateNotice(dto);
+        noticeService.upsertNotice(dto);
         return ApiResponseFactory.success(ResponseCode.NOTICE_UPDATED);
     }
 
     @PatchMapping("/points")
     public ResponseEntity<ApiResponse<UserPointResponse>> adjustPoint(@RequestBody UserPointRequest dto) {
-        return ApiResponseFactory.success(ResponseCode.USER_POINT_UPDATED, pointService.adjustUserPoint(dto.getUserId(), dto.getDelta()));
+        return ApiResponseFactory.success(ResponseCode.USER_POINT_UPDATED, pointService.adjustUserPoint(dto.getUsername(), dto.getDelta()));
     }
 
     @PostMapping("/problem")
@@ -59,6 +54,12 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Void>> deleteProblem(@PathVariable String number) {
         problemService.deleteProblem(number);
         return ApiResponseFactory.success(ResponseCode.PROBLEM_DELETED);
+    }
+
+    @GetMapping("/problem")
+    public ResponseEntity<ApiResponse<List<ProblemResponse>>> getAllProblemsPaged(@RequestParam(defaultValue = "0") int page) {
+//        return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getAllProblemsPaged(page));
+        return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getAllProblems());
     }
 
 }

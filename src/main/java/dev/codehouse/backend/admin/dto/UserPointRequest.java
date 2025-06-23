@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class UserPointRequest {
-    String userId;
+    String username;
     int delta;
 }
