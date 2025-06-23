@@ -21,14 +21,18 @@ public class Problem {
     private String title;
     private String problemNumber;
     private String url;
+    private String difficulty;
+    private int point;
     private String day;
     private LocalDateTime createdAt;
 
-    public static Problem createProblem(String title, String problemNumber, String url, String day) {
+    public static Problem createProblem(String title, String problemNumber, String url,  String difficulty, int point, String day) {
         return Problem.builder()
                 .title(title)
                 .problemNumber(problemNumber)
                 .url(url)
+                .difficulty(difficulty)
+                .point(point)
                 .day(day)
                 .createdAt(LocalDateTime.now())
                 .build();
