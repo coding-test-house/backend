@@ -55,13 +55,12 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
     // 배팅 처리
     @Override
-    public void bet(OddEvenRequestDto dto) {
+    public void bet(String username, OddEvenRequestDto dto) {
         validateBettingTime();
 
         String roundKey = getCurrentRoundKey();
         String betsKey = getBetsKey(roundKey);
 
-        String username = dto.getUsername().trim();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다: " + username));
 
@@ -100,11 +99,13 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         } catch (Exception e) {
             throw new RuntimeException("베팅 데이터 직렬화 실패", e);
         }
+
         redisRepository.putBet(betsKey, username, betJson);
 
         String scoreKey = getScoreKey(roundKey, dto.getBetType());
         redisRepository.addScoreToSortedSet(scoreKey, username, dto.getBetAmount());
     }
+
 
 
     /**
