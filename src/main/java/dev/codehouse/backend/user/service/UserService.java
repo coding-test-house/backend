@@ -65,14 +65,13 @@ public class UserService {
 
 
     private boolean getRightUser(String handle, String classes) throws Exception {
-        String urlStr = "https://www.acmicpc.net/user/" + handle;
+        String urlStr = "https://solved.ac/profile/" + handle;
         URL url = new URL(urlStr);
-        System.out.println(urlStr);
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; UserChecker/1.0)");
+            conn.setRequestProperty("User-Agent", "JavaRatingFetcher");
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 404) {
@@ -154,9 +153,6 @@ public class UserService {
                 System.out.println("already exist");
                 throw new DuplicateKeyException("이미 존재하는 사용자입니다");
             }
-            if(!getRightUser(request.getUsername(), request.getClasses())){
-                throw new IllegalArgumentException("회차 정보 또는 존재하지 않는 사용자입니다");
-            }
             User user = User.builder()
                     .username(request.getUsername())
                     .password(passwordEncoder.encode(request.getPassword()))
@@ -167,7 +163,6 @@ public class UserService {
                     .solvedProblems(null)
                     .gameResults(null)
                     .build();
-
             userRepository.save(user);
         } catch (DuplicateKeyException e) {
             // MongoDB의 unique 인덱스 위반
