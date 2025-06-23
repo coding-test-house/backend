@@ -35,6 +35,7 @@ public enum ResponseCode {
     USER_POINT_UPDATED(HttpStatus.OK, "사용자 포인트가 수정되었습니다."),
     PROBLEM_FOUND(HttpStatus.OK, "문제 조회 성공"),
     PROBLEM_DELETED(HttpStatus.OK, "문제 삭제 성공"),
+    USER_FOUND(HttpStatus.OK, "유저 조회 성공"),
 
     //201
     NOTICE_CREATED(HttpStatus.CREATED, "초기 공지사항이 생성되었습니다."),

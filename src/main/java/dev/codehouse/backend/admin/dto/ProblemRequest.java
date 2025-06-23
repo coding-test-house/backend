@@ -9,5 +9,7 @@ public class ProblemRequest {
     private String title;
     private String problemNumber;
     private String url;
+    private String difficulty;
+    private String point;
     private String day;
 }
