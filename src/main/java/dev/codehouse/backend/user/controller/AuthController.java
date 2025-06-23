@@ -4,14 +4,13 @@ package dev.codehouse.backend.user.controller;
 import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
+import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.dto.UserRequestDto;
+import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -21,6 +20,7 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody UserRequestDto request) {
@@ -71,5 +71,12 @@ public class AuthController {
             return ApiResponseFactory.success(ResponseCode.INVALID_PASSWORD,tokens);
         }
         return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, tokens);
+    }
+
+    @GetMapping("/{username}/point")
+    public Map<String, Integer> getPoint(@PathVariable String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+        return Map.of("point", user.getPoint());
     }
 }
