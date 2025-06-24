@@ -4,28 +4,26 @@ package dev.codehouse.backend.user.controller;
 import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
+import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.dto.UserRequestDto;
-import dev.codehouse.backend.user.service.UserService;
+import dev.codehouse.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody UserRequestDto request) {
         try {
-            userService.register(request);
+            authService.register(request);
         } catch (IllegalArgumentException e){
             if(e.getMessage().contains("회차")){
                 ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND);
@@ -43,7 +41,8 @@ public class AuthController {
     @PostMapping("/confirm")
     public ResponseEntity<ApiResponse<Void>> confirm(@RequestBody UserRequestDto request) {
         try {
-            userService.userExists(request.getUsername(), request.getClasses());
+            System.out.println(request.getUsername()+ " " + request.getClasses());
+            authService.userExists(request.getUsername(), request.getClasses());
         } catch (IllegalArgumentException e) {
             if(e.getMessage().contains("회차"))
                 return ApiResponseFactory.success(ResponseCode.CLASS_NOT_FOUND);
@@ -59,7 +58,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Map<String, String>>> login(@RequestBody UserRequestDto request) {
         Map<String, String> tokens = null;
         try {
-             tokens = userService.login(request);
+             tokens = authService.login(request);
         } catch (Exception e) {
             if(e.getMessage().contains("존재")){
                 return ApiResponseFactory.success(ResponseCode.USER_NOT_FOUND,tokens);

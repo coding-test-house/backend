@@ -17,18 +17,10 @@ public class AdminNoticeService {
 
     private static final String NOTICE_ID = "main-notice";
 
-    //초기 공지사항 생성
-    public void createInitialNotice() {
-        if (!noticeRepository.existsById(NOTICE_ID)) {
-            Notice initialNotice = Notice.createInitialNotice(NOTICE_ID);
-            noticeRepository.save(initialNotice);
-        }
-    }
-
     //공지사항 수정
-    public void updateNotice(NoticeRequest dto) {
+    public void upsertNotice(NoticeRequest dto) {
         Notice notice = noticeRepository.findById(NOTICE_ID)
-                .orElseThrow(() -> new AdminException(ResponseCode.NOTICE_NOT_FOUND));
+                        .orElseGet(() -> Notice.createInitialNotice(NOTICE_ID));
         notice.update(dto.getTitle(), dto.getContent(), dto.getGameInfo());
         noticeRepository.save(notice);
     }

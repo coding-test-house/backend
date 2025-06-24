@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class AdminProblemService {
             throw new AdminException(ResponseCode.PROBLEM_ALREADY_EXISTS);
         }
 
-        Problem problem = Problem.createProblem(dto.getTitle(), dto.getProblemNumber(), dto.getUrl(), dto.getDay());
+        Problem problem = Problem.createProblem(dto.getTitle(), dto.getProblemNumber(), dto.getUrl(), dto.getDifficulty(), calculatePoint(dto.getDifficulty()), dto.getDay());
         problemRepository.save(problem);
     }
 
@@ -40,5 +41,33 @@ public class AdminProblemService {
         return problems.stream()
                 .map(ProblemResponse::from)
                 .toList();
+    }
+
+    public List<ProblemResponse> getAllProblems() {
+        List<Problem> problems = problemRepository.findAll();
+        return problems.stream()
+                .map(ProblemResponse::from)
+                .toList();
+    }
+
+    //티어로 point 계산
+    private int calculatePoint(String difficulty) {
+        if (difficulty == null || difficulty.isEmpty()) {
+            return 0;
+        }
+        Map<String, Integer> basePointMap = Map.of(
+                "B", 50,
+                "S", 300,
+                "G", 600,
+                "P", 1000
+        );
+        try {
+            String tier = difficulty.substring(0, 1);
+            int level = Integer.parseInt(difficulty.substring(1));
+            int basePoint = basePointMap.getOrDefault(tier, 0);
+            return basePoint + (5 - level) * 50;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

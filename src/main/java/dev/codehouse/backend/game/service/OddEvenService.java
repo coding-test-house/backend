@@ -55,14 +55,14 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
     // 배팅 처리
     @Override
-    public void bet(OddEvenRequestDto dto) {
+    public void bet(String username, OddEvenRequestDto dto) {
         validateBettingTime();
 
         String roundKey = getCurrentRoundKey();
         String betsKey = getBetsKey(roundKey);
 
-        User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다: " + dto.getUsername()));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다: " + username));
 
         if (user.getPoint() < dto.getBetAmount()) {
             throw new IllegalArgumentException("포인트 부족");
@@ -72,10 +72,10 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
         Bet updatedBet;
 
-        if (allBets != null && allBets.containsKey(dto.getUsername())) {
+        if (allBets != null && allBets.containsKey(username)) {
             Bet existingBet;
             try {
-                existingBet = objectMapper.readValue(allBets.get(dto.getUsername()), Bet.class);
+                existingBet = objectMapper.readValue(allBets.get(username), Bet.class);
             } catch (Exception e) {
                 throw new RuntimeException("Redis 데이터 파싱 실패", e);
             }
@@ -85,9 +85,9 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
             }
 
             int newAmount = existingBet.getBetAmount() + dto.getBetAmount();
-            updatedBet = new Bet(dto.getUsername(), newAmount, dto.getBetType());
+            updatedBet = new Bet(username, newAmount, dto.getBetType());
         } else {
-            updatedBet = new Bet(dto.getUsername(), dto.getBetAmount(), dto.getBetType());
+            updatedBet = new Bet(username, dto.getBetAmount(), dto.getBetType());
         }
 
         user.setPoint(user.getPoint() - dto.getBetAmount());
@@ -99,11 +99,14 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         } catch (Exception e) {
             throw new RuntimeException("베팅 데이터 직렬화 실패", e);
         }
-        redisRepository.putBet(betsKey, dto.getUsername(), betJson);
+
+        redisRepository.putBet(betsKey, username, betJson);
 
         String scoreKey = getScoreKey(roundKey, dto.getBetType());
-        redisRepository.addScoreToSortedSet(scoreKey, dto.getUsername(), dto.getBetAmount());
+        redisRepository.addScoreToSortedSet(scoreKey, username, dto.getBetAmount());
     }
+
+
 
     /**
      * 50분에 호출되는 결과 계산 메서드
@@ -122,12 +125,12 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
         int resultNumber = random.nextInt(100) + 1;
         boolean isEven = (resultNumber % 2 == 0);
-
         String resultType = isEven ? "even" : "odd";
 
         redisRepository.putResult(getResultKey(roundKey), resultType);
+        System.out.println("RESULT SAVED: key=" + getResultKey(roundKey) + ", value=" + resultType);
 
-        //점수 분배
+
         for (String betJson : allBets.values()) {
             Bet bet;
             try {
@@ -140,18 +143,23 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
                     .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + bet.getUsername()));
 
             boolean userChoseEven = bet.getBetType().equalsIgnoreCase("even");
-            if (userChoseEven == isEven) {
-                //배당 내용(수정 예정)
+            boolean win = (userChoseEven == isEven);
+
+            if (win) {
                 user.setPoint(user.getPoint() + bet.getBetAmount() * 2);
+                user.addGameResult(List.of(roundKey, "WIN", String.valueOf(bet.getBetAmount())));
+            } else {
+                user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
             }
 
             userRepository.save(user);
         }
-
-        redisRepository.deleteBets(betsKey);
-        redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
-        redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
+//
+//        redisRepository.deleteBets(betsKey);
+//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
+//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
     }
+
 
     /**
      * 00분에 호출되는 메서드 (새로운 라운드 시작 전 초기화)
@@ -173,33 +181,11 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
      * 결과가 없으면 빈 데이터 반환
      */
     public BetSummaryResponseDto getCurrentRoundResult(String username) {
-        LocalDateTime now = LocalDateTime.now();
-        int minute = now.getMinute();
-
-        if (minute < 50) {
-            return new BetSummaryResponseDto(
-                    getCurrentRoundKey(),
-                    new BetSummaryResponseDto.SideSummary(0, List.of()),
-                    new BetSummaryResponseDto.SideSummary(0, List.of()),
-                    null,
-                    null // 결과 홀 또는 짝
-            );
-        }
-
         String roundKey = getCurrentRoundKey();
         String betsKey = getBetsKey(roundKey);
         String resultKey = getResultKey(roundKey);
 
-        String resultType = redisRepository.getResult(resultKey);
-        if (resultType == null) {
-            return new BetSummaryResponseDto(
-                    roundKey,
-                    new BetSummaryResponseDto.SideSummary(0, List.of()),
-                    new BetSummaryResponseDto.SideSummary(0, List.of()),
-                    null,
-                    null
-            );
-        }
+        int minute = LocalDateTime.now().getMinute();
 
         Map<String, String> allBets = redisRepository.getAllBets(betsKey);
         if (allBets == null) allBets = Collections.emptyMap();
@@ -216,24 +202,36 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
                 } else if ("even".equalsIgnoreCase(bet.getBetType())) {
                     evenBets.merge(bet.getUsername(), bet.getBetAmount(), Integer::sum);
                 }
-                if (bet.getUsername().equals(username)) {
+
+                if (bet.getUsername().equalsIgnoreCase(username.trim())) {
                     myBet = new MyBetDto(bet.getBetType(), bet.getBetAmount());
                 }
+
             } catch (Exception e) {
+                //
             }
         }
 
         BetSummaryResponseDto.SideSummary oddSummary = summarize(oddBets);
         BetSummaryResponseDto.SideSummary evenSummary = summarize(evenBets);
 
+        // 50분 이후에는 결과 보여주기
+        String resultType = null;
+        if (minute >= 50) {
+            resultType = redisRepository.getResult(resultKey);
+            System.out.println("RESULT FETCHED: key=" + resultKey + ", value=" + resultType);
+        }
+
+
         return new BetSummaryResponseDto(
                 roundKey,
-                evenSummary,
+                evenSummary, // even이 먼저
                 oddSummary,
                 myBet,
-                resultType // 홀짝 결과
+                resultType // 50분 이전이면 null
         );
     }
+
 
 
     private BetSummaryResponseDto.SideSummary summarize(Map<String, Integer> userBets) {
