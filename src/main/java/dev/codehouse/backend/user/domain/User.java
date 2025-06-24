@@ -48,6 +48,9 @@ public class User {
     @Builder.Default
     private List<String> solvedProblems = new ArrayList<>();
 
+    @Builder.Default
+    private List<History> histories = new ArrayList<>();
+
     public static User of(String username, String encodedPassword, String classes) {
         return User.builder()
                 .username(username)
@@ -99,4 +102,6 @@ public class User {
         }
         solvedProblems.add(problemNo);
     }
+
+
 }
