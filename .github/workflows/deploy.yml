@@ -36,7 +36,7 @@ jobs:
           JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
           PROD_ORIGIN: ${{ secrets.PROD_ORIGIN }}
 
-      - name: Build Spring Boot JAR
+      - name: Build Spring Boot JAR (skip tests)
         run: ./gradlew clean build
 
       - name: Upload project to EC2
