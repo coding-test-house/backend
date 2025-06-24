@@ -25,6 +25,16 @@ jobs:
       - name: Grant permission to Gradle wrapper
         run: chmod +x ./gradlew
 
+      - name: Replace environment variables in application-prod.yml
+        run: |
+          envsubst < ./src/main/resources/application-prod.yml > ./src/main/resources/application-prod.yml.tmp
+          mv ./src/main/resources/application-prod.yml.tmp ./src/main/resources/application-prod.yml
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+          JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+
       - name: Build Spring Boot JAR
         run: ./gradlew clean build
 
