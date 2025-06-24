@@ -46,6 +46,8 @@ public class User {
     private List<List<String>> gameResults = new ArrayList<>();
 
     @Builder.Default
+    private List<List<String>> betting=new ArrayList<>();
+    @Builder.Default
     private List<String> solvedProblems = new ArrayList<>();
 
     @Builder.Default
@@ -102,6 +104,4 @@ public class User {
         }
         solvedProblems.add(problemNo);
     }
-
-
 }
