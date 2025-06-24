@@ -91,6 +91,12 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         }
 
         user.setPoint(user.getPoint() - dto.getBetAmount());
+        String betTimeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+        user.getBetting().add(List.of(
+                betTimeStr,
+                dto.getBetType().equalsIgnoreCase("odd") ? "홀" : "짝",
+                String.valueOf(dto.getBetAmount())
+        ));
         userRepository.save(user);
 
         String betJson;
@@ -112,8 +118,8 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
      * 50분에 호출되는 결과 계산 메서드
      * 1) 현재 라운드(시 단위)의 베팅 데이터 조회
      * 2) 랜덤 홀짝 결과 생성 후 Redis에 저장 (resultKey)
-     * 3) 맞춘 유저에게 포인트 지급
-     * 4) 베팅 데이터 및 점수 데이터 삭제 (새 라운드 전용)
+     * 3) 맞춘 유저에게 포인트 차등 지급
+     *
      */
     @Override
     public void calculateResult() {
@@ -130,34 +136,58 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         redisRepository.putResult(getResultKey(roundKey), resultType);
         System.out.println("RESULT SAVED: key=" + getResultKey(roundKey) + ", value=" + resultType);
 
+        Map<String, Bet> winBets = new HashMap<>();
+        Map<String, Bet> loseBets = new HashMap<>();
+        int totalWinAmount = 0;
+        int totalLoseAmount = 0;
 
-        for (String betJson : allBets.values()) {
+        for (Map.Entry<String, String> entry : allBets.entrySet()) {
             Bet bet;
             try {
-                bet = objectMapper.readValue(betJson, Bet.class);
+                bet = objectMapper.readValue(entry.getValue(), Bet.class);
             } catch (Exception e) {
                 throw new RuntimeException("Redis 데이터 파싱 실패", e);
             }
-
-            User user = userRepository.findByUsername(bet.getUsername())
-                    .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + bet.getUsername()));
 
             boolean userChoseEven = bet.getBetType().equalsIgnoreCase("even");
             boolean win = (userChoseEven == isEven);
 
             if (win) {
-                user.setPoint(user.getPoint() + bet.getBetAmount() * 2);
-                user.addGameResult(List.of(roundKey, "WIN", String.valueOf(bet.getBetAmount())));
+                winBets.put(bet.getUsername(), bet);
+                totalWinAmount += bet.getBetAmount();
             } else {
-                user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
+                loseBets.put(bet.getUsername(), bet);
+                totalLoseAmount += bet.getBetAmount();
             }
+        }
 
+        // 포인트 분배
+        for (Map.Entry<String, Bet> entry : winBets.entrySet()) {
+            String username = entry.getKey();
+            Bet bet = entry.getValue();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + username));
+
+            int originalBet = bet.getBetAmount();
+            double ratio = (double) originalBet / totalWinAmount;
+            int shareFromLosers = (int) (ratio * totalLoseAmount);
+
+            int totalReturn = originalBet + shareFromLosers;
+
+            user.setPoint(user.getPoint() + totalReturn);
+            user.addGameResult(List.of(roundKey, "WIN", String.valueOf(originalBet), String.valueOf(shareFromLosers)));
             userRepository.save(user);
         }
-//
-//        redisRepository.deleteBets(betsKey);
-//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "odd"));
-//        redisRepository.deleteSortedSet(getScoreKey(roundKey, "even"));
+
+        for (Map.Entry<String, Bet> entry : loseBets.entrySet()) {
+            String username = entry.getKey();
+            Bet bet = entry.getValue();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + username));
+
+            user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
+            userRepository.save(user);
+        }
     }
 
 

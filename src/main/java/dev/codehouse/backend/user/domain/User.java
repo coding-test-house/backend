@@ -46,7 +46,12 @@ public class User {
     private List<List<String>> gameResults = new ArrayList<>();
 
     @Builder.Default
+    private List<List<String>> betting=new ArrayList<>();
+    @Builder.Default
     private List<String> solvedProblems = new ArrayList<>();
+
+    @Builder.Default
+    private List<History> histories = new ArrayList<>();
 
     public static User of(String username, String encodedPassword, String classes) {
         return User.builder()
@@ -87,5 +92,16 @@ public class User {
         } catch (Exception e) {
             throw new RuntimeException("External API Error: Failed to check problem status", e);
         }
+    }
+
+    public boolean hasSolvedProblem(String problemNo) {
+        return solvedProblems.contains(problemNo);
+    }
+
+    public void addSolvedProblem(String problemNo) {
+        if (solvedProblems.contains(problemNo)) {
+            throw new RuntimeException("이미 풀었던 문제입니다");
+        }
+        solvedProblems.add(problemNo);
     }
 }

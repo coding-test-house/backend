@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("solvedCheck")
+@RequestMapping("/api/solvedCheck")
 @RequiredArgsConstructor
 public class ProblemController {
     private final ProblemCheckService problemCheckService;
