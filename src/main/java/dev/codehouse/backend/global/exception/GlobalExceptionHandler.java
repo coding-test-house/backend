@@ -24,12 +24,23 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ResponseCode.DUPLICATE_USERNAME));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
-        ResponseCode responseCode = determineResponseCode(e.getMessage());
-        return ResponseEntity.status(responseCode.getStatus())
-                .body(ApiResponse.error(responseCode));
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthException(BaseException e) {
+        return ResponseEntity
+                .status(e.getCode().getStatus())
+                .body(ApiResponse.error(e.getCode()));
     }
+
+
+
+
+
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
+//        ResponseCode responseCode = determineResponseCode(e.getMessage());
+//        return ResponseEntity.status(responseCode.getStatus())
+//                .body(ApiResponse.error(responseCode));
+//    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
@@ -39,13 +50,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(responseCode));
     }
 
-    private ResponseCode determineResponseCode(String message) {
-        if (message.contains("사용자를 찾을 수 없") || message.contains("존재하지 않는")) {
-            return ResponseCode.USER_NOT_FOUND;
-        } else if (message.contains("비밀번호") || message.contains("일치하지 않")) {
-            return ResponseCode.INVALID_PASSWORD;
-        } else {
-            return ResponseCode.INVALID_REQUEST;
-        }
-    }
+//    private ResponseCode determineResponseCode(String message) {
+//        if (message.contains("사용자를 찾을 수 없") || message.contains("존재하지 않는")) {
+//            return ResponseCode.USER_NOT_FOUND;
+//        } else if (message.contains("비밀번호") || message.contains("일치하지 않")) {
+//            return ResponseCode.INVALID_PASSWORD;
+//        } else {
+//            return ResponseCode.INVALID_REQUEST;
+//        }
+//    }
 }

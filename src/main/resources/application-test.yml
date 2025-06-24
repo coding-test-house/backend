@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/testdb
+
+jwt:
+  secret: dummydummydummydummydummydummydummy
+  access-expiration: 1000
+  refresh-expiration: 2000
