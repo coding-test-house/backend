@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.codehouse.backend.game.domain.Bet;
 import dev.codehouse.backend.game.dto.BetSummaryResponseDto;
 import dev.codehouse.backend.game.dto.MyBetDto;
+import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.game.dto.OddEvenRequestDto;
 import dev.codehouse.backend.game.repository.RedisRepository;
-import dev.codehouse.backend.user.domain.User;
+import dev.codehouse.backend.user.domain.History;
 import dev.codehouse.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -54,6 +54,64 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
     }
 
     // 배팅 처리
+//    @Override
+//    public void bet(String username, OddEvenRequestDto dto) {
+//        validateBettingTime();
+//
+//        String roundKey = getCurrentRoundKey();
+//        String betsKey = getBetsKey(roundKey);
+//
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다: " + username));
+//
+//        if (user.getPoint() < dto.getBetAmount()) {
+//            throw new IllegalArgumentException("포인트 부족");
+//        }
+//
+//        Map<String, String> allBets = redisRepository.getAllBets(betsKey);
+//
+//        Bet updatedBet;
+//
+//        if (allBets != null && allBets.containsKey(username)) {
+//            Bet existingBet;
+//            try {
+//                existingBet = objectMapper.readValue(allBets.get(username), Bet.class);
+//            } catch (Exception e) {
+//                throw new RuntimeException("Redis 데이터 파싱 실패", e);
+//            }
+//
+//            if (!existingBet.getBetType().equalsIgnoreCase(dto.getBetType())) {
+//                throw new IllegalArgumentException("'" + existingBet.getBetType() + "'에 이미 배팅한 유저는 반대 방향에 배팅할 수 없습니다.");
+//            }
+//
+//            int newAmount = existingBet.getBetAmount() + dto.getBetAmount();
+//            updatedBet = new Bet(username, newAmount, dto.getBetType());
+//        } else {
+//            updatedBet = new Bet(username, dto.getBetAmount(), dto.getBetType());
+//        }
+//
+//        user.setPoint(user.getPoint() - dto.getBetAmount());
+//        String betTimeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+//        user.getBetting().add(List.of(
+//                betTimeStr,
+//                dto.getBetType().equalsIgnoreCase("odd") ? "홀" : "짝",
+//                String.valueOf(dto.getBetAmount())
+//        ));
+//        userRepository.save(user);
+//
+//        String betJson;
+//        try {
+//            betJson = objectMapper.writeValueAsString(updatedBet);
+//        } catch (Exception e) {
+//            throw new RuntimeException("베팅 데이터 직렬화 실패", e);
+//        }
+//
+//        redisRepository.putBet(betsKey, username, betJson);
+//
+//        String scoreKey = getScoreKey(roundKey, dto.getBetType());
+//        redisRepository.addScoreToSortedSet(scoreKey, username, dto.getBetAmount());
+//    }
+
     @Override
     public void bet(String username, OddEvenRequestDto dto) {
         validateBettingTime();
@@ -91,14 +149,29 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         }
 
         user.setPoint(user.getPoint() - dto.getBetAmount());
+
         String betTimeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
         user.getBetting().add(List.of(
                 betTimeStr,
                 dto.getBetType().equalsIgnoreCase("odd") ? "홀" : "짝",
                 String.valueOf(dto.getBetAmount())
         ));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시");
+        String formattedDate = LocalDateTime.now().format(formatter);
+        String betTypeKorean = dto.getBetType().equalsIgnoreCase("odd") ? "홀" : "짝";
+
+        user.getHistories().add(new History(
+                LocalDateTime.now(),
+                user.getUsername(),
+                "배팅",
+                formattedDate + " 게임 " + betTypeKorean + " 배팅",
+                -dto.getBetAmount()
+        ));
+
         userRepository.save(user);
 
+        // Redis 저장
         String betJson;
         try {
             betJson = objectMapper.writeValueAsString(updatedBet);
@@ -111,8 +184,6 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         String scoreKey = getScoreKey(roundKey, dto.getBetType());
         redisRepository.addScoreToSortedSet(scoreKey, username, dto.getBetAmount());
     }
-
-
 
     /**
      * 50분에 호출되는 결과 계산 메서드
