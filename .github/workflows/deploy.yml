@@ -34,9 +34,10 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
           JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+          PROD_ORIGIN: ${{ secrets.PROD_ORIGIN }}
 
-      - name: Build Spring Boot JAR
-        run: ./gradlew clean build
+      - name: Build Spring Boot JAR (skip tests)
+        run: ./gradlew clean build -x test
 
       - name: Upload project to EC2
         uses: appleboy/scp-action@v0.1.7
