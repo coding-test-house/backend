@@ -48,6 +48,19 @@ public class User {
     @Builder.Default
     private List<String> solvedProblems = new ArrayList<>();
 
+    public static User of(String username, String encodedPassword, String classes) {
+        return User.builder()
+                .username(username)
+                .password(encodedPassword)
+                .role("USER")
+                .startPoint(500)
+                .point(500)
+                .classes(classes)
+                .solvedProblems(new ArrayList<>())
+                .gameResults(new ArrayList<>())
+                .build();
+    }
+
     public void adjustPoint(int delta) {
         this.point += delta;
     }
