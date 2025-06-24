@@ -28,7 +28,7 @@ jobs:
       - name: Replace environment variables in application-prod.yml
         run: |
           envsubst < ./src/main/resources/application-prod.yml > ./src/main/resources/application-prod.yml.tmp
-          mv ./src/main/resources/application-prod.yml.tmgp ./src/main/resources/application-prod.yml
+          mv ./src/main/resources/application-prod.yml.tmp ./src/main/resources/application-prod.yml
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
