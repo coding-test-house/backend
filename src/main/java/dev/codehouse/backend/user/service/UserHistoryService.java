@@ -18,7 +18,7 @@ public class UserHistoryService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        History history = new History(LocalDateTime.now(), type, reason, amount);
+        History history = new History(LocalDateTime.now(), username, type, reason, amount);
         user.getHistories().add(history);
 
         // 포인트 수정 코드
