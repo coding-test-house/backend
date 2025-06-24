@@ -10,6 +10,9 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
+cors:
+  allowed-origins: http://localhost:3000,${PROD_ORIGIN}
+
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
