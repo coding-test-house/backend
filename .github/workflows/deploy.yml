@@ -22,11 +22,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build Spring Boot JAR
-        run: ./gradlew clean build
-
       - name: Grant permission to Gradle wrapper
         run: chmod +x ./gradlew
+
+      - name: Build Spring Boot JAR
+        run: ./gradlew clean build
 
       - name: Upload project to EC2
         uses: appleboy/scp-action@v0.1.7
