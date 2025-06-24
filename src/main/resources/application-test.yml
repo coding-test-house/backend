@@ -2,3 +2,8 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/testdb
+
+jwt:
+  secret: dummy
+  access-expiration: 1000
+  refresh-expiration: 2000
