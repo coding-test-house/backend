@@ -88,4 +88,15 @@ public class User {
             throw new RuntimeException("External API Error: Failed to check problem status", e);
         }
     }
+
+    public boolean hasSolvedProblem(String problemNo) {
+        return solvedProblems.contains(problemNo);
+    }
+
+    public void addSolvedProblem(String problemNo) {
+        if (solvedProblems.contains(problemNo)) {
+            throw new RuntimeException("이미 풀었던 문제입니다");
+        }
+        solvedProblems.add(problemNo);
+    }
 }
