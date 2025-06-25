@@ -9,7 +9,9 @@ import dev.codehouse.backend.game.dto.OddEvenRequestDto;
 import dev.codehouse.backend.game.repository.RedisRepository;
 import dev.codehouse.backend.user.domain.History;
 import dev.codehouse.backend.user.repository.UserRepository;
+import dev.codehouse.backend.user.service.UserHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,7 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();
+    private final UserHistoryService userHistoryService;
 
     // 라운드 키 - 시간 단위 (ex: 2025062017)
     private String getCurrentRoundKey() {
@@ -185,6 +188,16 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         redisRepository.addScoreToSortedSet(scoreKey, username, dto.getBetAmount());
     }
 
+
+    private String formatRoundKey(String roundKey) {
+        // 예: "2025062415" → "2025년 06월 24일 15시"
+        String year = roundKey.substring(0, 4);
+        String month = roundKey.substring(4, 6);
+        String day = roundKey.substring(6, 8);
+        String hour = roundKey.substring(8, 10);
+        return year + "년 " + month + "월 " + day + "일 " + hour + "시";
+    }
+
     /**
      * 50분에 호출되는 결과 계산 메서드
      * 1) 현재 라운드(시 단위)의 베팅 데이터 조회
@@ -247,6 +260,15 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
 
             user.setPoint(user.getPoint() + totalReturn);
             user.addGameResult(List.of(roundKey, "WIN", String.valueOf(originalBet), String.valueOf(shareFromLosers)));
+            String formatted = formatRoundKey(roundKey);
+            String reason = String.format("%s 게임 승리 보상 (+%dP)", formatted, shareFromLosers);
+            user.getHistories().add(new History(
+                    LocalDateTime.now(),
+                    username,
+                    "게임승리",
+                    reason,
+                    totalReturn
+            ));
             userRepository.save(user);
         }
 
@@ -257,6 +279,15 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
                     .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + username));
 
             user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
+            String formatted = formatRoundKey(roundKey);
+            String reason = String.format("%s 게임 패배 차감", formatted);
+            user.getHistories().add(new History(
+                    LocalDateTime.now(),
+                    username,
+                    "게임 패배",
+                    reason,
+                    0
+            ));
             userRepository.save(user);
         }
     }
