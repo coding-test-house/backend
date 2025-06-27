@@ -16,3 +16,4 @@ cors:
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.springframework.data.redis: DEBUG
