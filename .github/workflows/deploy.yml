@@ -35,6 +35,8 @@ jobs:
           JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
           JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
           PROD_ORIGIN: ${{ secrets.PROD_ORIGIN }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: Build Spring Boot JAR (skip tests)
         run: ./gradlew clean build -x test
