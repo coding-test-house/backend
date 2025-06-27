@@ -30,6 +30,7 @@ public enum ResponseCode {
     USER_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
     USER_REGISTER_SUCCESS(HttpStatus.CREATED, "회원가입에 성공했습니다"),
     USER_CONFIRM_SUCCESS(HttpStatus.OK,"사용자 확인에 성공했습니다"),
+    REPORT_SUBMIT_SUCCESS(HttpStatus.OK, "신고 제출에 성공했습니다."),
     NOTICE_FOUND(HttpStatus.OK, "공지사항 조회 성공"),
     NOTICE_UPDATED(HttpStatus.OK, "공지사항 수정 완료"),
     USER_POINT_UPDATED(HttpStatus.OK, "사용자 포인트가 수정되었습니다."),
