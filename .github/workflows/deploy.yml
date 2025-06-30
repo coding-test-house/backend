@@ -8,8 +8,8 @@ on:
       - closed
 
 jobs:
-  deploy:
-    if: github.event.pull_request.merged == true  # merge된 경우에만 실행
+  build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -41,15 +41,24 @@ jobs:
       - name: Build Spring Boot JAR (skip tests)
         run: ./gradlew clean build -x test
 
-      - name: Upload project to EC2
+      - name: Upload necessary files to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "."  # 전체 프로젝트 복사
+          source: |
+            build/libs/*.jar
+            Dockerfile
+            docker-compose.yml
+            src/main/resources/application-prod.yml
           target: "~/cote-house/backend"
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: SSH to EC2 and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -62,5 +71,4 @@ jobs:
             echo "✅ Starting deployment with Docker Compose"
             docker compose down
             docker image prune -f
-            docker volume prune -f
             docker compose up -d --build
