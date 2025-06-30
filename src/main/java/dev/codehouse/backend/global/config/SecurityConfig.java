@@ -4,6 +4,7 @@ import dev.codehouse.backend.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -28,6 +29,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/admin/notice").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/admin/problem/**").permitAll()
                         .requestMatchers("api/auth/**", "api/user/toprank/**", "/api/chat/**", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
