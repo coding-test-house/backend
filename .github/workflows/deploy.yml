@@ -39,7 +39,10 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: Build Spring Boot JAR (skip tests)
-        run: ./gradlew clean build -x test
+        run: ./gradlew bootJar -x test
+
+      - name: Check build output
+        run: ls -l build/libs
 
       - name: Upload necessary files to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -47,7 +50,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "build/libs/*.jar Dockerfile docker-compose.yml src/main/resources/application-prod.yml"
+          source: |
+            build/libs/*.jar
+            Dockerfile
+            docker-compose.yml
+            src/main/resources/application-prod.yml
           target: "~/cote-house/backend"
 
   deploy:
