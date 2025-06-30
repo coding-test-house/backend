@@ -39,7 +39,10 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: Build Spring Boot JAR (skip tests)
-        run: ./gradlew clean build -x test
+        run: ./gradlew bootJar -x test
+
+      - name: Check build output
+        run: ls -l build/libs
 
       - name: Upload necessary files to EC2
         uses: appleboy/scp-action@v0.1.7
