@@ -42,7 +42,12 @@ jobs:
         run: ./gradlew bootJar -x test
 
       - name: Check build output
-        run: ls -l build/libs
+        run: |
+          echo "🔍 Checking files before SCP..."
+          ls -l build/libs/backend-0.0.1-SNAPSHOT.jar
+          ls -l Dockerfile
+          ls -l docker-compose.yml
+          ls -l src/main/resources/application-prod.yml
 
       - name: Upload necessary files to EC2
         uses: appleboy/scp-action@v0.1.7
