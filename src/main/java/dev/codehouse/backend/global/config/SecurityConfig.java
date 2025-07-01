@@ -30,8 +30,12 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/admin/notice").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/admin/problem/**").permitAll()
-                        .requestMatchers("api/auth/**", "api/user/toprank/**", "/api/chat/**", "/ws/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/user/toprank/**",
+                                "/api/chat/**",
+                                "/ws/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
