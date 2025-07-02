@@ -44,11 +44,11 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(e.getCode()));
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
-        ResponseCode responseCode = e.getMessage().contains("API") ?
-                ResponseCode.EXTERNAL_API_ERROR : ResponseCode.DATABASE_ERROR;
-        return ResponseEntity.status(responseCode.getStatus())
-                .body(ApiResponse.error(responseCode));
-    }
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
+//        ResponseCode responseCode = e.getMessage().contains("API") ?
+//                ResponseCode.EXTERNAL_API_ERROR : ResponseCode.DATABASE_ERROR;
+//        return ResponseEntity.status(responseCode.getStatus())
+//                .body(ApiResponse.error(responseCode));
+//    }
 }

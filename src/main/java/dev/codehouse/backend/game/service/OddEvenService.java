@@ -7,11 +7,10 @@ import dev.codehouse.backend.game.dto.MyBetDto;
 import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.game.dto.OddEvenRequestDto;
 import dev.codehouse.backend.game.repository.RedisRepository;
-import dev.codehouse.backend.user.domain.History;
+import dev.codehouse.backend.user.domain.UserHistory;
 import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.user.service.UserHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -163,14 +162,8 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시");
         String formattedDate = LocalDateTime.now().format(formatter);
         String betTypeKorean = dto.getBetType().equalsIgnoreCase("odd") ? "홀" : "짝";
-
-        user.getHistories().add(new History(
-                LocalDateTime.now(),
-                user.getUsername(),
-                "배팅",
-                formattedDate + " 게임 " + betTypeKorean + " 배팅",
-                -dto.getBetAmount()
-        ));
+        String reason = formattedDate + " 게임 " + betTypeKorean + " 배팅";
+        user.getHistories().add(UserHistory.betting(user.getUsername(), reason, -dto.getBetAmount()));
 
         userRepository.save(user);
 
@@ -262,13 +255,7 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
             user.addGameResult(List.of(roundKey, "WIN", String.valueOf(originalBet), String.valueOf(shareFromLosers)));
             String formatted = formatRoundKey(roundKey);
             String reason = String.format("%s 게임 승리 보상 (+%dP)", formatted, shareFromLosers);
-            user.getHistories().add(new History(
-                    LocalDateTime.now(),
-                    username,
-                    "게임승리",
-                    reason,
-                    totalReturn
-            ));
+            user.getHistories().add(UserHistory.gameWin(username, reason, totalReturn));
             userRepository.save(user);
         }
 
@@ -281,13 +268,7 @@ public class OddEvenService implements GameService<OddEvenRequestDto> {
             user.addGameResult(List.of(roundKey, "LOSE", String.valueOf(bet.getBetAmount())));
             String formatted = formatRoundKey(roundKey);
             String reason = String.format("%s 게임 패배 차감", formatted);
-            user.getHistories().add(new History(
-                    LocalDateTime.now(),
-                    username,
-                    "게임 패배",
-                    reason,
-                    0
-            ));
+            user.getHistories().add(UserHistory.gameLoss(username, reason, 0));
             userRepository.save(user);
         }
     }
