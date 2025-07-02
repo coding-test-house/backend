@@ -4,13 +4,16 @@ import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
 import dev.codehouse.backend.user.domain.User;
+import dev.codehouse.backend.user.domain.UserHistory;
 import dev.codehouse.backend.user.dto.RankingResponseDto;
 import dev.codehouse.backend.user.dto.UserResponseDto;
 import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.user.service.UserFindService;
+import dev.codehouse.backend.user.service.UserHistoryService;
 import dev.codehouse.backend.user.service.UserRankingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,7 @@ public class UserController {
     private final UserFindService userFindService;
     private final UserRepository userRepository;
     private final UserRankingService userRankingService;
+    private final UserHistoryService userHistoryService;
 
     @GetMapping("/{username}")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable String username) {
@@ -54,5 +58,10 @@ public class UserController {
     @GetMapping("/toprank/class/{className}")
     public ResponseEntity<ApiResponse<List<RankingResponseDto>>> getClassRanking(@PathVariable String className){
         return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getclassRanking(className));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<List<UserHistory>>> getUserHistory(Authentication authentication) {
+        return ApiResponseFactory.success(ResponseCode.HISTORY_FOUND, userHistoryService.getUserHistory(authentication.getName()));
     }
 }

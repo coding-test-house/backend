@@ -51,7 +51,7 @@ public class User {
     private List<String> solvedProblems = new ArrayList<>();
 
     @Builder.Default
-    private List<History> histories = new ArrayList<>();
+    private List<UserHistory> histories = new ArrayList<>();
 
     public static User of(String username, String encodedPassword, String classes) {
         return User.builder()
@@ -72,26 +72,6 @@ public class User {
 
     public void addGameResult(List<String> result) {
         this.gameResults.add(result);
-    }
-
-    public boolean checkProblemSolved(String problemNo) {
-        if(solvedProblems.contains(problemNo)) {
-            throw new RuntimeException("This problem has already been solved");
-        }
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://www.acmicpc.net/status?problem_id="+problemNo+"&user_id="+username +"&language_id=-1&result_id=4"))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if(response.toString().contains("맞았습니다")) solvedProblems.add(problemNo);
-            else throw new RuntimeException("This problem is not solved");
-            return response.statusCode() == 200 && response.body().contains(username);
-        } catch (Exception e) {
-            throw new RuntimeException("External API Error: Failed to check problem status", e);
-        }
     }
 
     public boolean hasSolvedProblem(String problemNo) {
