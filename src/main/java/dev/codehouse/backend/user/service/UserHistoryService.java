@@ -1,6 +1,9 @@
 package dev.codehouse.backend.user.service;
 
-import dev.codehouse.backend.user.domain.History;
+import dev.codehouse.backend.global.exception.UserException;
+import dev.codehouse.backend.global.response.ResponseCode;
+import dev.codehouse.backend.user.domain.HistoryType;
+import dev.codehouse.backend.user.domain.UserHistory;
 import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +17,12 @@ import java.util.List;
 public class UserHistoryService {
     private final UserRepository userRepository;
 
-    public void addHistory(String username, String type, String reason, int amount) {
+    public void addUserHistory(String username, HistoryType type, String reason, int amount) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
 
-        History history = new History(LocalDateTime.now(), username, type, reason, amount);
-        user.getHistories().add(history);
+        UserHistory userHistory = new UserHistory(LocalDateTime.now(), username, type, reason, amount);
+        user.getHistories().add(userHistory);
 
         // 포인트 수정 코드
         // 필요시 추가 할 것
@@ -27,9 +30,9 @@ public class UserHistoryService {
         userRepository.save(user);
     }
 
-    public List<History> getUserHistory(String username) {
+    public List<UserHistory> getUserHistory(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserException(ResponseCode.USER_NOT_FOUND));
 
         return user.getHistories();
     }

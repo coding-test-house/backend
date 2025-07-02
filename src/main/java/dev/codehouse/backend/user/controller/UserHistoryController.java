@@ -1,8 +1,6 @@
 package dev.codehouse.backend.user.controller;
 
-import dev.codehouse.backend.user.domain.History;
 import dev.codehouse.backend.user.dto.HistoryRequest;
-import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.user.service.UserHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +19,7 @@ public class UserHistoryController {
     public ResponseEntity<String> addHistory(
             @RequestBody HistoryRequest request
     ) {
-        userHistoryService.addHistory(request.getUsername(), request.getType(), request.getReason(), request.getAmount());
+        userHistoryService.addUserHistory(request.getUsername(), request.getType(), request.getReason(), request.getAmount());
         return ResponseEntity.ok("history 에 추가 완료");
-    }
-
-    @GetMapping("/{username}")
-    public ResponseEntity<List<History>> getUserHistory(
-            @PathVariable String username
-    ) {
-        List<History> historyList = userHistoryService.getUserHistory(username);
-        return ResponseEntity.ok(historyList);
     }
 }

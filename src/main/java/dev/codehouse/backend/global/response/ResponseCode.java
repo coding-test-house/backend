@@ -38,6 +38,7 @@ public enum ResponseCode {
     PROBLEM_DELETED(HttpStatus.OK, "문제 삭제 성공"),
     USER_FOUND(HttpStatus.OK, "유저 조회 성공"),
     RANK_FOUND(HttpStatus.OK, "랭킹 조회 성공"),
+    HISTORY_FOUND(HttpStatus.OK, "정산내역 조회 성공"),
 
     //201
     NOTICE_CREATED(HttpStatus.CREATED, "초기 공지사항이 생성되었습니다."),
