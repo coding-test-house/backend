@@ -28,26 +28,17 @@ import java.util.Map;
 public class UserController {
 
     private final UserFindService userFindService;
-    private final UserRepository userRepository;
     private final UserRankingService userRankingService;
     private final UserHistoryService userHistoryService;
 
-    @GetMapping("/{username}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable String username) {
-        return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getUser(username));
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(Authentication authentication) {
+        return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getUser(authentication.getName()));
     }
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getAllUsers());
-    }
-
-
-    @GetMapping("/{username}/point")
-    public Map<String, Integer> getPoint(@PathVariable String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
-        return Map.of("point", user.getPoint());
     }
 
     @GetMapping("/ranking")

@@ -9,7 +9,6 @@ import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.global.util.JwtUtil;
 import dev.codehouse.backend.user.service.external.SolvedAcClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +58,7 @@ public class AuthService {
         validateRequest(request);
 
         if(userRepository.existsByUsername(request.getUsername())){
-            throw new DuplicateKeyException("이미 존재하는 사용자입니다.");
+            throw new AuthException(ResponseCode.USER_ALREADY_EXISTS);
         }
         User user = User.of(request.getUsername(), passwordEncoder.encode(request.getPassword()),request.getClasses());
         userRepository.save(user);

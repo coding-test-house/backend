@@ -30,6 +30,7 @@ public enum ResponseCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다"),
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "외부 API 호출 중 오류가 발생했습니다."),
     PROBLEM_ALREADY_EXISTS(HttpStatus.INTERNAL_SERVER_ERROR, "이미 존재하는 문제입니다"),
+    USER_ALREADY_EXISTS(HttpStatus.INTERNAL_SERVER_ERROR, "이미 존재하는 문제입니다"),
 
     //200 OK
     USER_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
