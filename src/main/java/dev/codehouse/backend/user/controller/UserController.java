@@ -5,8 +5,8 @@ import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
 import dev.codehouse.backend.user.domain.User;
 import dev.codehouse.backend.user.domain.UserHistory;
-import dev.codehouse.backend.user.dto.RankingResponseDto;
-import dev.codehouse.backend.user.dto.UserResponseDto;
+import dev.codehouse.backend.user.dto.RankingResponse;
+import dev.codehouse.backend.user.dto.UserResponse;
 import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.user.service.UserFindService;
 import dev.codehouse.backend.user.service.UserHistoryService;
@@ -33,12 +33,12 @@ public class UserController {
     private final UserHistoryService userHistoryService;
 
     @GetMapping("/{username}")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable String username) {
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable String username) {
         return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getUser(username));
     }
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getAllUsers());
     }
 
@@ -51,13 +51,13 @@ public class UserController {
     }
 
     @GetMapping("/ranking")
-    public ResponseEntity<ApiResponse<List<RankingResponseDto>>> getTopRanking(){
+    public ResponseEntity<ApiResponse<List<RankingResponse>>> getTopRanking(){
         return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getTopRanking());
     }
 
     @GetMapping("/ranking/{className}")
-    public ResponseEntity<ApiResponse<List<RankingResponseDto>>> getClassRanking(@PathVariable String className){
-        return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getclassRanking(className));
+    public ResponseEntity<ApiResponse<List<RankingResponse>>> getClassRanking(@PathVariable String className){
+        return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getClassRanking(className));
     }
 
     @GetMapping("/history")

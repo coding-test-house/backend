@@ -4,7 +4,7 @@ package dev.codehouse.backend.user.service;
 import dev.codehouse.backend.global.exception.AuthException;
 import dev.codehouse.backend.global.response.ResponseCode;
 import dev.codehouse.backend.user.domain.User;
-import dev.codehouse.backend.user.dto.UserRequestDto;
+import dev.codehouse.backend.user.dto.UserRequest;
 import dev.codehouse.backend.user.repository.UserRepository;
 import dev.codehouse.backend.global.util.JwtUtil;
 import dev.codehouse.backend.user.service.external.SolvedAcClient;
@@ -13,12 +13,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,7 +42,7 @@ public class AuthService {
         }
     }
 
-    private void validateRequest(UserRequestDto request) {
+    private void validateRequest(UserRequest request) {
         if (request == null || request.getUsername() == null || request.getPassword() == null) {
             throw new AuthException(ResponseCode.INVALID_REQUEST);
         }
@@ -61,7 +55,7 @@ public class AuthService {
      * @throws IllegalArgumentException 이미 존재하는 사용자이거나 클래스 정보가 유효하지 않은 경우
      * @throws RuntimeException         API 호출 실패시
      */
-    public void register(UserRequestDto request) {
+    public void register(UserRequest request) {
         validateRequest(request);
 
         if(userRepository.existsByUsername(request.getUsername())){
@@ -79,7 +73,7 @@ public class AuthService {
      * @return 액세스 토큰과 리프레시 토큰이 담긴 Map
      * @throws IllegalArgumentException 사용자를 찾을 수 없거나 비밀번호가 일치하지 않는 경우
      */
-    public Map<String, String> login(UserRequestDto request) {
+    public Map<String, String> login(UserRequest request) {
         validateRequest(request);
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new AuthException(ResponseCode.USER_NOT_FOUND));

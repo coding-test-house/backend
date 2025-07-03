@@ -4,8 +4,7 @@ package dev.codehouse.backend.user.controller;
 import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
-import dev.codehouse.backend.user.domain.User;
-import dev.codehouse.backend.user.dto.UserRequestDto;
+import dev.codehouse.backend.user.dto.UserRequest;
 import dev.codehouse.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody UserRequestDto request) {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody UserRequest request) {
         authService.register(request);
         return ApiResponseFactory.success(ResponseCode.USER_REGISTER_SUCCESS);
     }
@@ -61,7 +60,7 @@ public class AuthController {
 //    }
 
     @PostMapping("/confirm")
-    public ResponseEntity<ApiResponse<Void>> confirm(@RequestBody UserRequestDto request) {
+    public ResponseEntity<ApiResponse<Void>> confirm(@RequestBody UserRequest request) {
         authService.userExists(request.getUsername(), request.getClasses());
         return ApiResponseFactory.success(ResponseCode.USER_CONFIRM_SUCCESS);
     }
@@ -83,7 +82,7 @@ public class AuthController {
 //        return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS, tokens);
 //    }
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Map<String, String>>> login(@RequestBody UserRequestDto request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> login(@RequestBody UserRequest request) {
         Map<String, String> tokens = authService.login(request);
         return ApiResponseFactory.success(ResponseCode.USER_LOGIN_SUCCESS,tokens);
     }
