@@ -1,4 +1,4 @@
-package dev.codehouse.backend.problem.entity;
+package dev.codehouse.backend.problem.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

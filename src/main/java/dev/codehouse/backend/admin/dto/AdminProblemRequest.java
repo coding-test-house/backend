@@ -2,10 +2,8 @@ package dev.codehouse.backend.admin.dto;
 
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
-public class ProblemRequest {
+public class AdminProblemRequest {
     private String title;
     private String problemNumber;
     private String url;

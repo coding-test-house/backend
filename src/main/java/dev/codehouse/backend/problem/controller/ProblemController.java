@@ -1,31 +1,36 @@
 package dev.codehouse.backend.problem.controller;
 
+import dev.codehouse.backend.global.response.ApiResponse;
+import dev.codehouse.backend.global.response.ApiResponseFactory;
+import dev.codehouse.backend.global.response.ResponseCode;
+import dev.codehouse.backend.problem.dto.ProblemResponse;
+import dev.codehouse.backend.problem.dto.ProblemSubmitRequest;
 import dev.codehouse.backend.problem.service.ProblemCheckService;
+import dev.codehouse.backend.problem.service.ProblemFindService;
+import dev.codehouse.backend.problem.service.ProblemSubmitService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/solvedCheck")
+@RequestMapping("/api/problem")
 @RequiredArgsConstructor
 public class ProblemController {
-    private final ProblemCheckService problemCheckService;
 
-    @GetMapping("/check")
-    public boolean checkSolved(
-            @RequestParam("user") String userId,
-            @RequestParam("problem") int problemId) {
-        return problemCheckService.hasUserSolvedProblem(userId, problemId);
+    private final ProblemSubmitService problemSubmitService;
+    private final ProblemFindService problemFindService;
+
+    @PostMapping("/check")
+    public ResponseEntity<ApiResponse<Void>> submitProblems(@RequestBody ProblemSubmitRequest request, Authentication authentication) {
+        problemSubmitService.submitSolvedProblem(authentication.getName(), request.getProblemNumber(), request.getPoint());
+        return ApiResponseFactory.success(ResponseCode.PROBLEM_SOLVED);
     }
 
-    @GetMapping("/list")
-    public List<Integer> getProblemList(
-            @RequestParam("user") String userId,
-            @RequestParam(value = "size", defaultValue = "20") int size) {
-        return problemCheckService.getProblemList(userId, size);
+    @GetMapping("/{today}")
+    public ResponseEntity<ApiResponse<List<ProblemResponse>>> getProblems(@PathVariable String today, Authentication authentication) {
+        return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemFindService.getProblems(today, authentication.getName()));
     }
 }

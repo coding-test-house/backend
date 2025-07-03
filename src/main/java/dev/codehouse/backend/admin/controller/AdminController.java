@@ -8,7 +8,6 @@ import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,13 +39,13 @@ public class AdminController {
     }
 
     @PostMapping("/problem")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody ProblemRequest request) {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody AdminProblemRequest request) {
         problemService.saveProblem(request);
         return ApiResponseFactory.success(ResponseCode.PROBLEM_REGISTERED);
     }
 
     @GetMapping("/problem/{day}")
-    public ResponseEntity<ApiResponse<List<ProblemResponse>>> getByDay(@PathVariable String day) {
+    public ResponseEntity<ApiResponse<List<AdminProblemResponse>>> getByDay(@PathVariable String day) {
         return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getProblems(day));
     }
 
@@ -57,7 +56,7 @@ public class AdminController {
     }
 
     @GetMapping("/problem")
-    public ResponseEntity<ApiResponse<List<ProblemResponse>>> getAllProblemsPaged(@RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<ApiResponse<List<AdminProblemResponse>>> getAllProblemsPaged(@RequestParam(defaultValue = "0") int page) {
 //        return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getAllProblemsPaged(page));
         return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getAllProblems());
     }
