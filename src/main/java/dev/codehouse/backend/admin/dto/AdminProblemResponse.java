@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ProblemResponse {
+public class AdminProblemResponse {
     private String title;
     private String problemNumber;
     private String url;
@@ -14,8 +14,8 @@ public class ProblemResponse {
     private int point;
     private String day;
 
-    public static ProblemResponse from(Problem problem) {
-        return new ProblemResponse(
+    public static AdminProblemResponse from(Problem problem) {
+        return new AdminProblemResponse(
                 problem.getTitle(),
                 problem.getProblemNumber(),
                 problem.getUrl(),

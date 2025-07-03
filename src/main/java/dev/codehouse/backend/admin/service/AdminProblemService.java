@@ -1,7 +1,7 @@
 package dev.codehouse.backend.admin.service;
 
-import dev.codehouse.backend.admin.dto.ProblemRequest;
-import dev.codehouse.backend.admin.dto.ProblemResponse;
+import dev.codehouse.backend.admin.dto.AdminProblemRequest;
+import dev.codehouse.backend.admin.dto.AdminProblemResponse;
 import dev.codehouse.backend.problem.entity.Problem;
 import dev.codehouse.backend.admin.repository.ProblemRepository;
 import dev.codehouse.backend.global.exception.AdminException;
@@ -19,7 +19,7 @@ public class AdminProblemService {
     private final ProblemRepository problemRepository;
 
     //문제 등록
-    public void saveProblem(ProblemRequest dto) {
+    public void saveProblem(AdminProblemRequest dto) {
         if (problemRepository.findByProblemNumber(dto.getProblemNumber()).isPresent()) {
             throw new AdminException(ResponseCode.PROBLEM_ALREADY_EXISTS);
         }
@@ -36,17 +36,17 @@ public class AdminProblemService {
     }
 
     //날짜로 문제 조회
-    public List<ProblemResponse> getProblems(String day) {
+    public List<AdminProblemResponse> getProblems(String day) {
         List<Problem> problems = problemRepository.findByDay(day);
         return problems.stream()
-                .map(ProblemResponse::from)
+                .map(AdminProblemResponse::from)
                 .toList();
     }
 
-    public List<ProblemResponse> getAllProblems() {
+    public List<AdminProblemResponse> getAllProblems() {
         List<Problem> problems = problemRepository.findAll();
         return problems.stream()
-                .map(ProblemResponse::from)
+                .map(AdminProblemResponse::from)
                 .toList();
     }
 

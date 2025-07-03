@@ -50,12 +50,12 @@ public class UserController {
         return Map.of("point", user.getPoint());
     }
 
-    @GetMapping("/toprank/all")
+    @GetMapping("/ranking")
     public ResponseEntity<ApiResponse<List<RankingResponseDto>>> getTopRanking(){
         return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getTopRanking());
     }
 
-    @GetMapping("/toprank/class/{className}")
+    @GetMapping("/ranking/{className}")
     public ResponseEntity<ApiResponse<List<RankingResponseDto>>> getClassRanking(@PathVariable String className){
         return ApiResponseFactory.success(ResponseCode.RANK_FOUND,userRankingService.getclassRanking(className));
     }
