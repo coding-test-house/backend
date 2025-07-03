@@ -1,6 +1,6 @@
 package dev.codehouse.backend.admin.dto;
 
-import dev.codehouse.backend.admin.entity.Notice;
+import dev.codehouse.backend.admin.domain.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

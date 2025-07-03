@@ -1,6 +1,6 @@
-package dev.codehouse.backend.admin.dto;
+package dev.codehouse.backend.problem.dto;
 
-import dev.codehouse.backend.problem.entity.Problem;
+import dev.codehouse.backend.problem.domain.Problem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,17 +11,17 @@ public class ProblemResponse {
     private String problemNumber;
     private String url;
     private String difficulty;
-    private int point;
-    private String day;
+    private int points;
+    private boolean solved;
 
-    public static ProblemResponse from(Problem problem) {
+    public static ProblemResponse from(Problem problem, boolean solved) {
         return new ProblemResponse(
                 problem.getTitle(),
                 problem.getProblemNumber(),
                 problem.getUrl(),
                 problem.getDifficulty(),
                 problem.getPoint(),
-                problem.getDay()
+                solved
         );
     }
 }

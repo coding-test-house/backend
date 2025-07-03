@@ -2,7 +2,7 @@ package dev.codehouse.backend.admin.service;
 
 import dev.codehouse.backend.admin.dto.NoticeRequest;
 import dev.codehouse.backend.admin.dto.NoticeResponse;
-import dev.codehouse.backend.admin.entity.Notice;
+import dev.codehouse.backend.admin.domain.Notice;
 import dev.codehouse.backend.admin.repository.NoticeRepository;
 import dev.codehouse.backend.global.exception.AdminException;
 import dev.codehouse.backend.global.response.ResponseCode;
