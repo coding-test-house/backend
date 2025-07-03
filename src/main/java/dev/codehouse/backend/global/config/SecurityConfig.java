@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin/notice").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/user/toprank/**",
+                                "/api/user/ranking/**",
                                 "/api/chat/**",
                                 "/ws/**"
                         ).permitAll()

@@ -1,4 +1,4 @@
-package dev.codehouse.backend.admin.entity;
+package dev.codehouse.backend.admin.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

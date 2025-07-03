@@ -13,6 +13,8 @@ public enum ResponseCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
     DUPLICATE_USERNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다"),
+    PROBLEM_NOT_SOLVED(HttpStatus.BAD_REQUEST, "문제를 아직 해결하지 않았습니다."),
+    PROBLEM_NOT_TODAY(HttpStatus.BAD_REQUEST, "오늘의 문제가 아닙니다."),
     //401 Unauthorized
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "존재하지 않는 아이디입니다."),
 
@@ -20,6 +22,9 @@ public enum ResponseCode {
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "공지사항이 존재하지 않습니다."),
     PROBLEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 문제가 존재하지 않습니다."),
     CLASS_NOT_FOUND(HttpStatus.NOT_FOUND, "회차 정보가 올바르지 않습니다"),
+
+    //409 Conflict
+    PROBLEM_ALREADY_SOLVED(HttpStatus.CONFLICT, "이미 해결한 문제입니다."),
 
     //500 Internal Server Error
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다"),
@@ -39,6 +44,7 @@ public enum ResponseCode {
     USER_FOUND(HttpStatus.OK, "유저 조회 성공"),
     RANK_FOUND(HttpStatus.OK, "랭킹 조회 성공"),
     HISTORY_FOUND(HttpStatus.OK, "정산내역 조회 성공"),
+    PROBLEM_SOLVED(HttpStatus.OK, "문제 해결 및 포인트 적립 완료"),
 
     //201
     NOTICE_CREATED(HttpStatus.CREATED, "초기 공지사항이 생성되었습니다."),

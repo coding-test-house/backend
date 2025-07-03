@@ -2,8 +2,8 @@ package dev.codehouse.backend.admin.service;
 
 import dev.codehouse.backend.admin.dto.AdminProblemRequest;
 import dev.codehouse.backend.admin.dto.AdminProblemResponse;
-import dev.codehouse.backend.problem.entity.Problem;
-import dev.codehouse.backend.admin.repository.ProblemRepository;
+import dev.codehouse.backend.problem.domain.Problem;
+import dev.codehouse.backend.problem.repository.ProblemRepository;
 import dev.codehouse.backend.global.exception.AdminException;
 import dev.codehouse.backend.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
