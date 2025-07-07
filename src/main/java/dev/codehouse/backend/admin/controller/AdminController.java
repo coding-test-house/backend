@@ -7,6 +7,8 @@ import dev.codehouse.backend.admin.service.AdminProblemService;
 import dev.codehouse.backend.global.response.ApiResponse;
 import dev.codehouse.backend.global.response.ApiResponseFactory;
 import dev.codehouse.backend.global.response.ResponseCode;
+import dev.codehouse.backend.user.dto.UserResponse;
+import dev.codehouse.backend.user.service.UserFindService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ public class AdminController {
     private final AdminNoticeService noticeService;
     private final AdminPointService pointService;
     private final AdminProblemService problemService;
+    private final UserFindService userFindService;
 
     @GetMapping("/notice")
     public ResponseEntity<ApiResponse<NoticeResponse>> getNotice() {
@@ -38,15 +41,15 @@ public class AdminController {
         return ApiResponseFactory.success(ResponseCode.USER_POINT_UPDATED, pointService.adjustUserPoint(dto.getUsername(), dto.getDelta()));
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        return ApiResponseFactory.success(ResponseCode.USER_FOUND, userFindService.getAllUsers());
+    }
+
     @PostMapping("/problem")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody AdminProblemRequest request) {
         problemService.saveProblem(request);
         return ApiResponseFactory.success(ResponseCode.PROBLEM_REGISTERED);
-    }
-
-    @GetMapping("/problem/{day}")
-    public ResponseEntity<ApiResponse<List<AdminProblemResponse>>> getByDay(@PathVariable String day) {
-        return ApiResponseFactory.success(ResponseCode.PROBLEM_FOUND, problemService.getProblems(day));
     }
 
     @DeleteMapping("/problem/{number}")

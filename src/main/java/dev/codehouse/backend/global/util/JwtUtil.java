@@ -29,21 +29,22 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    private JwtBuilder jwtBuilder(String username, long expirationMills) {
+    private JwtBuilder jwtBuilder(String username, String role, long expirationMills) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expirationMills))
                 .signWith(key);
     }
 
-    public String generateAccessToken(String username) {
-        return jwtBuilder(username, accessExpiration).compact();
+    public String generateAccessToken(String username, String role) {
+        return jwtBuilder(username, role, accessExpiration).compact();
     }
 
-    public String generateRefreshToken(String username) {
-        return jwtBuilder(username, refreshExpiration).compact();
+    public String generateRefreshToken(String username, String role) {
+        return jwtBuilder(username, role, refreshExpiration).compact();
     }
 
     private io.jsonwebtoken.JwtParser createJwtParser() {
@@ -71,4 +72,10 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    public String extractRole(String token) {
+        return createJwtParser()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+    }
 }

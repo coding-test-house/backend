@@ -82,8 +82,8 @@ public class AuthService {
         }
 
         return Map.of(
-          "accessToken", jwtUtil.generateAccessToken(user.getUsername()),
-                "refreshToken", jwtUtil.generateRefreshToken(user.getUsername())
+          "accessToken", jwtUtil.generateAccessToken(user.getUsername(), user.getRole()),
+                "refreshToken", jwtUtil.generateRefreshToken(user.getUsername(), user.getRole())
         );
     }
 
