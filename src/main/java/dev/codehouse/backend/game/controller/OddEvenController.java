@@ -5,6 +5,7 @@ import dev.codehouse.backend.game.dto.BetSummaryResponseDto;
 import dev.codehouse.backend.game.dto.OddEvenRequestDto;
 import dev.codehouse.backend.game.service.OddEvenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,18 +15,15 @@ public class OddEvenController {
 
     private final OddEvenService oddEvenService;
 
-    @PostMapping("/bet/{username}")
-    public void bet(@PathVariable String username, @RequestBody OddEvenRequestDto dto) {
-        oddEvenService.bet(username, dto);
+    @PostMapping("/bet")
+    public void bet(Authentication authentication, @RequestBody OddEvenRequestDto dto) {
+        oddEvenService.bet(authentication.getName(), dto);
     }
 
-
-
-    @GetMapping("/roundSummary/{username}")
-    public BetSummaryResponseDto getCurrentRoundSummary(@PathVariable String username) {
-        return oddEvenService.getCurrentRoundResult(username);
+    @GetMapping("/roundSummary")
+    public BetSummaryResponseDto getCurrentRoundSummary(Authentication authentication) {
+        return oddEvenService.getCurrentRoundResult(authentication.getName());
     }
-
 
     @PostMapping("/calculate")
     public void calculate() {
