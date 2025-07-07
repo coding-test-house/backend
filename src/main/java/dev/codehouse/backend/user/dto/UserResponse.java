@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserResponseDto {
+public class UserResponse {
     private String username;
     private String classes;
     private int point;
 
-    public static UserResponseDto from(User user) {
-        return new UserResponseDto(
+    public static UserResponse from(User user) {
+        return new UserResponse(
                 user.getUsername(),
                 user.getClasses(),
                 user.getPoint()
