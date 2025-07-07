@@ -36,19 +36,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ResponseCode.DUPLICATE_USERNAME.getStatus())
                 .body(ApiResponse.error(ResponseCode.DUPLICATE_USERNAME));
     }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAuthException(BaseException e) {
-        return ResponseEntity
-                .status(e.getCode().getStatus())
-                .body(ApiResponse.error(e.getCode()));
-    }
-
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
-//        ResponseCode responseCode = e.getMessage().contains("API") ?
-//                ResponseCode.EXTERNAL_API_ERROR : ResponseCode.DATABASE_ERROR;
-//        return ResponseEntity.status(responseCode.getStatus())
-//                .body(ApiResponse.error(responseCode));
-//    }
 }
